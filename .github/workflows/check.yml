@@ -1,0 +1,12 @@
+# mazapan plugins check on every push, pull request and version tag (every
+# theme, every language, what the plugin registry asks).
+name: Check
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  check:
+    uses: rick-dev-creator/mazapan-plugins/.github/workflows/check-plugin.yml@main

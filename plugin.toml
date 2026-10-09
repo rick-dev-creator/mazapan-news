@@ -1,0 +1,87 @@
+[plugin]
+id = "news"
+name = "News"
+version = "0.1.0"
+api = 1
+description = "The news from where you're from and where you live, in the languages you read: Google News' editions by country and language, its sections (science, entertainment…) and your own topics (AI, crypto…), in a quiet icon in the bar and a panel made for reading"
+requires = ["shell-bar", "hypr-base"]
+categories = ["panel", "bar"]
+author = "RickDev"
+homepage = "https://github.com/rick-dev-creator/mazapan-news"
+license = "MIT"
+
+# How it looks, for the plugin gallery (mazapan.dev/plugins).
+[gallery]
+icon = "media/icon.svg"
+screenshots = ["media/panel.webp", "media/sources.webp", "media/light.webp"]
+
+# Python fetches and reads the feeds (its own library only); xdg-utils
+# opens an article in the browser.
+[packages]
+pacman = ["python", "xdg-utils"]
+
+[settings]
+# Opens the news.
+key = "SUPER + ALT + E"
+# Its icon in the bar.
+bar = true
+# A dot on the icon when there's news since you last looked.
+dot = true
+# How often it looks for news, in minutes (Ctrl+R in the panel looks now).
+every = { default = 30, min = 10, max = 240, step = 10 }
+# How many headlines from each source.
+per_source = { default = 20, min = 5, max = 50, step = 5 }
+
+# The settings, read live by the shell.
+[[targets]]
+template = "settings.json.tmpl"
+output = "~/.config/quickshell/mazapan/components/news/settings.json"
+
+# The helper: fetches the feeds, keeps your sources and what came.
+[[targets]]
+template = "news.py.tmpl"
+output = "~/.local/share/mazapan/bin/news"
+
+[[targets]]
+template = "qmldir.tmpl"
+output = "~/.config/quickshell/mazapan/components/news/qmldir"
+reload = "sh ~/.local/share/mazapan/bin/shell-reload"
+
+[[targets]]
+template = "NewsService.qml.tmpl"
+output = "~/.config/quickshell/mazapan/components/news/NewsService.qml"
+reload = "sh ~/.local/share/mazapan/bin/shell-reload"
+
+[[targets]]
+template = "Panel.qml.tmpl"
+output = "~/.config/quickshell/mazapan/panels/news.qml"
+reload = "sh ~/.local/share/mazapan/bin/shell-reload"
+
+[[targets]]
+template = "Bar.qml.tmpl"
+output = "~/.config/quickshell/mazapan/widgets/right/44-news.qml"
+reload = "sh ~/.local/share/mazapan/bin/shell-reload"
+
+[[targets]]
+template = "news.lua.tmpl"
+output = "~/.config/hypr/mazapan/news.lua"
+reload = "hyprctl reload >/dev/null"
+
+[[actions]]
+name = "{{ t \"act.open\" }}"
+run = "qs ipc -c mazapan call mazapan panel news"
+# On the palette's first screen, among the places.
+home = 36
+glyph = "󰎕"
+label = "{{ t \"title\" }}"
+key = "{{ settings.key }}"
+keywords = "{{ t \"act.open.kw\" }}"
+
+[[actions]]
+name = "{{ t \"act.refresh\" }}"
+run = "qs ipc -c mazapan call news refresh"
+keywords = "{{ t \"act.refresh.kw\" }}"
+
+[[checks]]
+name = "{{ t \"check.helper\" }}"
+run = "python3 -I ~/.local/share/mazapan/bin/news editions >/dev/null"
